@@ -16,7 +16,7 @@ CXX           = @echo compiling $< && g++
 DEFINES       = -DUNICODE -D_UNICODE -DWIN32 -DMINGW_HAS_SECURE_API=1 -Dmain=qMain -DqMain=studentMain -DQT_QML_DEBUG -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_MULTIMEDIA_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_NEEDS_QMAIN
 CFLAGS        = -fno-keep-inline-dllexport -O2 -Wall -Wextra -Wextra $(DEFINES)
 CXXFLAGS      = -fno-keep-inline-dllexport -O2 -Wall -Wextra -Wextra -Werror=return-type -Werror=uninitialized -Wunused-parameter -Wmissing-field-initializers -Wno-old-style-cast -Wno-sign-compare -Wno-sign-conversion -Wno-unused-const-variable -Wlogical-op -fexceptions -mthreads $(DEFINES)
-INCPATH       = -I../../../hello -I. -I../../../hello -I"C:/Users/Zhu Jun/AppData/Local/cs106/include" -IC:/Qt/6.10.1/mingw_64/include -IC:/Qt/6.10.1/mingw_64/include/QtWidgets -IC:/Qt/6.10.1/mingw_64/include/QtMultimedia -IC:/Qt/6.10.1/mingw_64/include/QtGui -IC:/Qt/6.10.1/mingw_64/include/QtNetwork -IC:/Qt/6.10.1/mingw_64/include/QtCore -Irelease -I/include -IC:/Qt/6.10.1/mingw_64/mkspecs/win32-g++ 
+INCPATH       = -I../../../lec1-1 -I. -I../../../lec1-1 -I"C:/Users/Zhu Jun/AppData/Local/cs106/include" -IC:/Qt/6.10.1/mingw_64/include -IC:/Qt/6.10.1/mingw_64/include/QtWidgets -IC:/Qt/6.10.1/mingw_64/include/QtMultimedia -IC:/Qt/6.10.1/mingw_64/include/QtGui -IC:/Qt/6.10.1/mingw_64/include/QtNetwork -IC:/Qt/6.10.1/mingw_64/include/QtCore -Irelease -I/include -IC:/Qt/6.10.1/mingw_64/mkspecs/win32-g++ 
 LINKER      =        @echo linking $@ && g++
 LFLAGS        =        -L"C:/Users/Zhu Jun/AppData/Local/cs106/lib" -Wl,-s -Wl,-subsystem,windows -mthreads
 LIBS        =        -lcs106 -lpthread C:\Qt\6.10.1\mingw_64\lib\libQt6Widgets.a C:\Qt\6.10.1\mingw_64\lib\libQt6Multimedia.a C:\Qt\6.10.1\mingw_64\lib\libQt6Gui.a C:\Qt\6.10.1\mingw_64\lib\libQt6Network.a C:\Qt\6.10.1\mingw_64\lib\libQt6Core.a -lmingw32 C:\Qt\6.10.1\mingw_64\lib\libQt6EntryPoint.a -lshell32  
@@ -55,16 +55,16 @@ OBJECTS       = release/main.o
 
 DIST          =   ..\..\main.cpp
 QMAKE_TARGET  = hello
-DESTDIR        = ..\..\..\hello\ #avoid trailing-slash linebreak
+DESTDIR        = ..\..\..\lec1-1\ #avoid trailing-slash linebreak
 TARGET         = hello.exe
-DESTDIR_TARGET = ..\..\..\hello\hello.exe
+DESTDIR_TARGET = ..\..\..\lec1-1\hello.exe
 
 ####### Build rules
 
 first: all
-all: Makefile.Release  ../../../hello/hello.exe
+all: Makefile.Release  ../../../lec1-1/hello.exe
 
-../../../hello/hello.exe: C:/Qt/6.10.1/mingw_64/lib/libQt6Widgets.a C:/Qt/6.10.1/mingw_64/lib/libQt6Multimedia.a C:/Qt/6.10.1/mingw_64/lib/libQt6Gui.a C:/Qt/6.10.1/mingw_64/lib/libQt6Network.a C:/Qt/6.10.1/mingw_64/lib/libQt6Core.a C:/Qt/6.10.1/mingw_64/lib/libQt6EntryPoint.a $(OBJECTS) 
+../../../lec1-1/hello.exe: C:/Qt/6.10.1/mingw_64/lib/libQt6Widgets.a C:/Qt/6.10.1/mingw_64/lib/libQt6Multimedia.a C:/Qt/6.10.1/mingw_64/lib/libQt6Gui.a C:/Qt/6.10.1/mingw_64/lib/libQt6Network.a C:/Qt/6.10.1/mingw_64/lib/libQt6Core.a C:/Qt/6.10.1/mingw_64/lib/libQt6EntryPoint.a $(OBJECTS) 
 	$(LINKER) $(LFLAGS) -o $(DESTDIR_TARGET) $(OBJECTS) $(LIBS)
 
 qmake: FORCE
