@@ -60,10 +60,8 @@ int main() {
     else {
         tailor(choice, currentAge, row, col);
     }
-
-
-
-
+    Grid<int> next(row, col);
+    nextGen(currentAge, next);
 
     return 0;
 }
@@ -104,3 +102,33 @@ void random(Grid<int>& currentAge, int& row, int& col) {
         }
     }
 }
+
+void nextGen(Grid<int>& currentAge, Grid<int>& next) {
+    for (int r = 0; r < row; r++) {
+        for (int c = 0; c < col; c++) {
+            int neighborCount = 0;
+            for (int i = -1; i <= 1; i++) {
+                for (int j = -1; j <= 1; j++) {
+                    nr = r + i;
+                    nc = c + j;
+                    if (neiborAge.inBounds(nr, nj) && (i || j)
+                        && currentAge[ni][nj] > 0) {
+                        neighborCount++;
+                    }
+                }
+            }
+            switch (neighborCount) {
+            case 0:
+            case 1:
+                next[r][c] = 0;
+            case 2:
+                next[r][c] = currentAge[r][c] ? currentAge[r][c] + 1 : 0;
+            case 3:
+                next[r][c] = currentAge[r][c] + 1
+            default:
+                next[r][c] = 0;
+            }
+        }
+    }
+}
+
