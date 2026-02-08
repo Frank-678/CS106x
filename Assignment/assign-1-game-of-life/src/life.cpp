@@ -110,10 +110,10 @@ void nextGen(Grid<int>& currentAge, Grid<int>& next) {
             int neighborCount = 0;
             for (int i = -1; i <= 1; i++) {
                 for (int j = -1; j <= 1; j++) {
-                    nr = r + i;
-                    nc = c + j;
+                    int nr = r + i;
+                    int nc = c + j;
                     if (neiborAge.inBounds(nr, nj) && (i || j)
-                        && currentAge[ni][nj] > 0) {
+                        && currentAge[nr][nc] > 0) {
                         neighborCount++;
                     }
                 }
