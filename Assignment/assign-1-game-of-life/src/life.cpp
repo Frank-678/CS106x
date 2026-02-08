@@ -20,6 +20,7 @@ using namespace std;
 
 void tailor(string choice, Grid<int>& currentAge, int& row, int& col);
 void random(Grid<int>& currentAge, int& row, int& col);
+void nextGen(Grid<int>& currentAge, Grid<int>& next);
 
 /**
  * Function: welcome
@@ -104,8 +105,8 @@ void random(Grid<int>& currentAge, int& row, int& col) {
 }
 
 void nextGen(Grid<int>& currentAge, Grid<int>& next) {
-    for (int r = 0; r < row; r++) {
-        for (int c = 0; c < col; c++) {
+    for (int r = 0; r < currentAge.height(); r++) {
+        for (int c = 0; c < currentAge.width(); c++) {
             int neighborCount = 0;
             for (int i = -1; i <= 1; i++) {
                 for (int j = -1; j <= 1; j++) {
@@ -124,7 +125,7 @@ void nextGen(Grid<int>& currentAge, Grid<int>& next) {
             case 2:
                 next[r][c] = currentAge[r][c] ? currentAge[r][c] + 1 : 0;
             case 3:
-                next[r][c] = currentAge[r][c] + 1
+                next[r][c] = currentAge[r][c] + 1;
             default:
                 next[r][c] = 0;
             }
