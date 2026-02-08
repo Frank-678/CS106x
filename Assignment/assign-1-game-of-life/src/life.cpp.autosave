@@ -60,10 +60,8 @@ int main() {
     else {
         tailor(choice, currentAge, row, col);
     }
-
-
-
-
+    Grid<int> next(row, col);
+    nextGen(currentAge, next);
 
     return 0;
 }
@@ -104,3 +102,5 @@ void random(Grid<int>& currentAge, int& row, int& col) {
         }
     }
 }
+
+void nextGen(Grid<int>& currentAge, Grid<int>& currentAge)
