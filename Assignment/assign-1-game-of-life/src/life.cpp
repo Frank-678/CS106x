@@ -135,5 +135,9 @@ void nextGen(Grid<int>& currentAge, Grid<int>& next) {
             }
         }
     }
+    if (currentAge != next) {
+        currentAge = next;
+        next.resize(currentAge.numRows(), currentAge.numCols());
+    }
 }
 
