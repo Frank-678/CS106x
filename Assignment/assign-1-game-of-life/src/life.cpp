@@ -1,0 +1,99 @@
+/**
+ * File: life.cpp
+ * --------------
+ * Implements the Game of Life.
+ */
+
+#include <iostream>  // for cout
+#include <fstream> // for ifstream
+#include <string> // for string
+using namespace std;
+
+#include "console.h" // required of all files that contain the main function
+#include "simpio.h"  // for getLine。
+#include "gevent.h" // for mouse event detection
+#include "grid.h" // for Grid
+#include "strlib.h"
+
+#include "life-constants.h"  // for kMaxAge
+#include "life-graphics.h"   // for class LifeDisplay
+
+void tailor(string choice, Grid<int>& currentAge);
+void random(Grid<int>& currentAge);
+
+/**
+ * Function: welcome
+ * -----------------
+ * Introduces the user to the Game of Life and its rules.
+ */
+static void welcome() {
+    cout << "Welcome to the game of Life, a simulation of the lifecycle of a bacteria colony." << endl;
+    cout << "Cells live and die by the following rules:" << endl << endl;
+    cout << "\tA cell with 1 or fewer neighbors dies of loneliness" << endl;
+    cout << "\tLocations with 2 neighbors remain stable" << endl;
+    cout << "\tLocations with 3 neighbors will spontaneously create life" << endl;
+    cout << "\tLocations with 4 or more neighbors die of overcrowding" << endl << endl;
+    cout << "In the animation, new cells are dark and fade to gray as they age." << endl << endl;
+    getLine("Hit [enter] to continue....   "); // 有“enter to continue”的功能
+}
+
+/**
+ * Function: main
+ * --------------
+ * Provides the entry point of the entire program.
+ */
+int main() {
+    LifeDisplay display;
+    display.setTitle("Game of Life");
+    welcome();
+
+    cout << "You can start your colony with random cells or read from a prepared file.";
+    string choice = getLine("Enter name of colony file (or RETURN to seed randomly): ");
+    LifeDisplay diagram;
+    diagram.setTitle(choice.c_str());
+    // initialize
+    Grid<int> currentAge;
+    if (choice == "") {
+        random(currentAge);
+    }
+    else {
+        tailor(choice, currentAge);
+    }
+    return 0;
+}
+
+void tailor(string choice, Grid<int>& currentAge) {
+    ifstream input;
+    string address = "files\\" + choice;
+    input.open(address.c_str());
+    string rowstr, colstr;
+    getline(input, rowstr);
+    getline(input, colstr);
+    int row = stringToInteger(rowstr), col = stringToInteger(colstr);
+    currentAge.resize(row, col);
+    string line;
+    int r = 0;
+    while (getline(input, line)) {
+        for (int c = 0; c < col; c++) {
+            if (line[c] == 'X') {
+                currentAge[r][c] = 1;
+            }
+            else if (line[c] == '-') {
+                currentAge[r][c] = 0;
+            }
+        }
+        r++;
+    }
+}
+
+
+void random(Grid<int>& currentAge) {
+    int row = randomInteger(RANMIN, RANMAX);
+    int col = randomInteger(RANMIN, RANMAX);
+    currentAge.resize(row, col);
+    for (int r = 0; r < row; r++) {
+        for (int c = 0; c < col; c++) {
+            currentAge[r][c] = randomInteger(0, 1);
+        }
+    }
+}
