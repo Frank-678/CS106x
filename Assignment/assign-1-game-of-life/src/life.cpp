@@ -58,7 +58,7 @@ int main() {
     if (choice == "") {
         random(currentAge, row, col);
     }
-    else {
+    else{
         tailor(choice, currentAge, row, col);
     }
     Grid<int> next(row, col);
@@ -138,6 +138,7 @@ void nextGen(Grid<int>& currentAge, Grid<int>& next) {
     if (currentAge != next) {
         currentAge = next;
         next.resize(currentAge.numRows(), currentAge.numCols());
+        next(currentAge, next)
     }
 }
 
