@@ -53,11 +53,11 @@ int getSleepTime() {
         int option = getInteger("Your choice: ");
         switch (option) {
         case 1:
-            return 500;
+            return 200;
         case 2:
-            return 2000;
+            return 500;
         case 3:
-            return 5000;
+            return 1500;
         case 4:
             return -1;
         default:
