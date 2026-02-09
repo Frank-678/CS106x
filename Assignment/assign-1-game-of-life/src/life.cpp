@@ -116,7 +116,7 @@ int main() {
 
 void tailor(string choice, Grid<int>& currentAge, int& row, int& col) {
     ifstream input;
-    string address = "res\\files\\" + choice;
+    string address = "D:\\Users\\Zhu Jun\\Documents\\Stanford CS106\\CS106\\Assignment\\assign-1-game-of-life\\res\\files\\" + choice;
     input.open(address.c_str());
     string rowstr, colstr;
     getline(input, rowstr);
