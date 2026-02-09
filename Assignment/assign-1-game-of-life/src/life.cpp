@@ -49,32 +49,35 @@ int main() {
     welcome();
 
     cout << "You can start your colony with random cells or read from a prepared file.";
-    while (string choice = getLine("Enter name of colony file (or RETURN to seed randomly): ")) {
+    while (true) {
         // initialize
+        string choice = getLine("Enter name of colony file (or RETURN to seed randomly): ");
         LifeDisplay diagram;
         Grid<int> currentAge;
         int row, col;
-        string address = "files\\" + choice;
         if (choice == "") {
             random(currentAge, row, col);
             diagram.setTitle("Random Colony");
         }
-        else if (fileExists(address)) {
+        else if (fileExists("files\\" + choice)) {
             tailor(choice, currentAge, row, col);
             diagram.setTitle(choice);
         }
         else {
-            cout << "Unable to open the file named "Fsh".  Please select another file." << endl;
+            cout << "Unable to open the file named " << choice << ".  Please select another file." << endl;
             continue;
         }
         Grid<int> next(row, col);
-        nextGen(currentAge, next);
+        while (true) {
+            nextGen(currentAge, next);
+        }
     }
     return 0;
 }
 
 void tailor(string choice, Grid<int>& currentAge, int& row, int& col) {
     ifstream input;
+    string address = "files\\" + choice;
     input.open(address.c_str());
     string rowstr, colstr;
     getline(input, rowstr);
@@ -143,7 +146,6 @@ void nextGen(Grid<int>& currentAge, Grid<int>& next) {
     if (currentAge != next) {
         currentAge = next;
         next.resize(currentAge.numRows(), currentAge.numCols());
-        next(currentAge, next)
     }
 }
 
