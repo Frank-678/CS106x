@@ -12,17 +12,15 @@ using namespace std;
 #include "console.h" // required of all files that contain the main function
 #include "filelib.h" // fileExists
 #include "simpio.h"  // for getLine。
-#include "gevent.h" // for mouse event detection and pause
 #include "grid.h" // for Grid
 #include "strlib.h"
 
-#include "life-constants.h"  // for kMaxAge
+#include "life-constants.h"  // for kMaxAge, RANMIN and RANMAX
 #include "life-graphics.h"   // for class LifeDisplay
 
 void tailor(string choice, Grid<int>& currentAge, int& row, int& col);
 void random(Grid<int>& currentAge, int& row, int& col);
 void nextGen(Grid<int>& currentAge, Grid<int>& next, LifeDisplay& diagram);
-static void runAnimation(LifeDisplay& display, Grid<int>& board, int ms);
 
 /**
  * Function: welcome
@@ -41,11 +39,11 @@ static void welcome() {
 }
 
 /**
- * Function: sleep
+ * Function: getSleepTime
  * -----------------
- * Stop for a period of time based on user's option
+ * Get a period of time to delay based on user's option
  */
-static void sleep() {
+int getSleepTime() {
     cout << "You choose how fast to run the simulation." << endl;
     cout << "\t1 = As fast as this chip can go!" << endl;
     cout << "\t2 = Not too fast, this is a school zone." << endl;
@@ -55,17 +53,13 @@ static void sleep() {
         int option = getInteger("Your choice: ");
         switch (option) {
         case 1:
-            pause(500);
-            return;
+            return 500;
         case 2:
-            pause(2000);
-            return;
+            return 2000;
         case 3:
-            pause(5000);
-            return;
+            return 5000;
         case 4:
-            runAnimation(diagram, currentAge, 1);
-            return;
+            return -1;
         default:
             cout << "Please enter a number between 1 and 4!" << endl;
             break;
@@ -79,34 +73,42 @@ static void sleep() {
  * Provides the entry point of the entire program.
  */
 int main() {
-    LifeDisplay display;
-    display.setTitle("Game of Life");
+    LifeDisplay diagram;
+    diagram.setTitle("Game of Life");
     welcome();
 
     cout << "You can start your colony with random cells or read from a prepared file.";
     while (true) {
         // initialize
         string choice = getLine("Enter name of colony file (or RETURN to seed randomly): ");
-        LifeDisplay diagram;
         Grid<int> currentAge;
         int row, col;
         if (choice == "") {
             random(currentAge, row, col);
             diagram.setTitle("Random Colony");
-        }
-        else if (fileExists("files\\" + choice)) {
+        } else if (fileExists("files\\" + choice)) {
             tailor(choice, currentAge, row, col);
             diagram.setTitle(choice);
-        }
-        else {
+        } else {
             cout << "Unable to open the file named " << choice << ".  Please select another file." << endl;
             continue;
         }
         diagram.setDimensions(row, col);
         Grid<int> next(row, col);
+        for(int r = 0; r < row; r++) {
+            for(int c = 0; c < col; c++) {
+                diagram.drawCellAt(r, c, currentAge[r][c]);
+            }
+        }
+        diagram.repaint();
+        int delay = getSleepTime();
         while (true) {
+            if (delay == -1) {
+                getLine();
+            } else {
+                pause(delay);
+            }
             nextGen(currentAge, next, diagram);
-            sleep();
         }
     }
     return 0;
@@ -114,7 +116,7 @@ int main() {
 
 void tailor(string choice, Grid<int>& currentAge, int& row, int& col) {
     ifstream input;
-    string address = "files\\" + choice;
+    string address = "res\\files\\" + choice;
     input.open(address.c_str());
     string rowstr, colstr;
     getline(input, rowstr);
@@ -178,25 +180,12 @@ void nextGen(Grid<int>& currentAge, Grid<int>& next, LifeDisplay& diagram) {
                 next[r][c] = 0;
                 break;
             }
-            diagram.drawCellAt(r, c, currentAge[r][c]);
+            diagram.drawCellAt(r, c, next[r][c]);
         }
     }
+    diagram.repaint();
     if (currentAge != next) {
         currentAge = next;
         next.resize(currentAge.numRows(), currentAge.numCols());
     }
-}
-
-static void runAnimation(LifeDisplay& display, Grid<int>& board, int ms) {
-    GTimer timer(ms);
-    timer.start();
-    while (true) {
-        GEvent event = waitForEvent(TIMER_EVENT + MOUSE_EVENT);
-        if (event.getEventClass() == TIMER_EVENT) {
-            advanceBoard(display, board);
-        } else if (event.getEventType() == MOUSE_PRESSED) {
-            break;
-        }
-    }
-    timer.stop();
 }
