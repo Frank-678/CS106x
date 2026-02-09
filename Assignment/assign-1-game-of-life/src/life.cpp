@@ -12,7 +12,7 @@ using namespace std;
 #include "console.h" // required of all files that contain the main function
 #include "filelib.h" // fileExists
 #include "simpio.h"  // for getLine。
-#include "gevent.h" // for mouse event detection
+#include "gevent.h" // for mouse event detection and pause
 #include "grid.h" // for Grid
 #include "strlib.h"
 
@@ -21,7 +21,8 @@ using namespace std;
 
 void tailor(string choice, Grid<int>& currentAge, int& row, int& col);
 void random(Grid<int>& currentAge, int& row, int& col);
-void nextGen(Grid<int>& currentAge, Grid<int>& next);
+void nextGen(Grid<int>& currentAge, Grid<int>& next, LifeDisplay& diagram);
+static void runAnimation(LifeDisplay& display, Grid<int>& board, int ms);
 
 /**
  * Function: welcome
@@ -37,6 +38,39 @@ static void welcome() {
     cout << "\tLocations with 4 or more neighbors die of overcrowding" << endl << endl;
     cout << "In the animation, new cells are dark and fade to gray as they age." << endl << endl;
     getLine("Hit [enter] to continue....   "); // 有“enter to continue”的功能
+}
+
+/**
+ * Function: sleep
+ * -----------------
+ * Stop for a period of time based on user's option
+ */
+static void sleep() {
+    cout << "You choose how fast to run the simulation." << endl;
+    cout << "\t1 = As fast as this chip can go!" << endl;
+    cout << "\t2 = Not too fast, this is a school zone." << endl;
+    cout << "\t3 = Nice and slow so I can watch everything that happens." << endl;
+    cout << "\t4 = Require enter key be pressed before advancing to next generation." << endl;
+    while (true) {
+        int option = getInteger("Your choice: ");
+        switch (option) {
+        case 1:
+            pause(500);
+            return;
+        case 2:
+            pause(2000);
+            return;
+        case 3:
+            pause(5000);
+            return;
+        case 4:
+            runAnimation(diagram, currentAge, 1);
+            return;
+        default:
+            cout << "Please enter a number between 1 and 4!" << endl;
+            break;
+        }
+    }
 }
 
 /**
@@ -68,9 +102,11 @@ int main() {
             cout << "Unable to open the file named " << choice << ".  Please select another file." << endl;
             continue;
         }
+        diagram.setDimensions(row, col);
         Grid<int> next(row, col);
         while (true) {
-            nextGen(currentAge, next);
+            nextGen(currentAge, next, diagram);
+            sleep();
         }
     }
     return 0;
@@ -113,7 +149,7 @@ void random(Grid<int>& currentAge, int& row, int& col) {
     }
 }
 
-void nextGen(Grid<int>& currentAge, Grid<int>& next) {
+void nextGen(Grid<int>& currentAge, Grid<int>& next, LifeDisplay& diagram) {
     for (int r = 0; r < currentAge.numRows(); r++) {
         for (int c = 0; c < currentAge.numCols(); c++) {
             int neighborCount = 0;
@@ -142,6 +178,7 @@ void nextGen(Grid<int>& currentAge, Grid<int>& next) {
                 next[r][c] = 0;
                 break;
             }
+            diagram.drawCellAt(r, c, currentAge[r][c]);
         }
     }
     if (currentAge != next) {
@@ -150,3 +187,16 @@ void nextGen(Grid<int>& currentAge, Grid<int>& next) {
     }
 }
 
+static void runAnimation(LifeDisplay& display, Grid<int>& board, int ms) {
+    GTimer timer(ms);
+    timer.start();
+    while (true) {
+        GEvent event = waitForEvent(TIMER_EVENT + MOUSE_EVENT);
+        if (event.getEventClass() == TIMER_EVENT) {
+            advanceBoard(display, board);
+        } else if (event.getEventType() == MOUSE_PRESSED) {
+            break;
+        }
+    }
+    timer.stop();
+}
