@@ -86,7 +86,7 @@ int main() {
         if (choice == "") {
             random(currentAge, row, col);
             diagram.setTitle("Random Colony");
-        } else if (fileExists("files\\" + choice)) {
+        } else if (fileExists("files/" + choice)) {
             tailor(choice, currentAge, row, col);
             diagram.setTitle(choice);
         } else {
@@ -116,7 +116,7 @@ int main() {
 
 void tailor(string choice, Grid<int>& currentAge, int& row, int& col) {
     ifstream input;
-    string address = "D:\\Users\\Zhu Jun\\Documents\\Stanford CS106\\CS106\\Assignment\\assign-1-game-of-life\\res\\files\\" + choice;
+    string address = "files/" + choice;
     input.open(address.c_str());
     string rowstr, colstr;
     getline(input, rowstr);
