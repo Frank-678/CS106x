@@ -119,6 +119,11 @@ void tailor(string choice, Grid<int>& currentAge, int& row, int& col) {
     string address = "D:/Users/Zhu Jun/Documents/Stanford CS106/CS106/Assignment/assign-1-game-of-life/res/files/" + choice;
     input.open(address.c_str());
     string rowstr, colstr;
+    while (getline(input, line)) {
+        if (line.length() > 0 && line[0] != '#') {
+            break;
+        }
+    }
     getline(input, rowstr);
     getline(input, colstr);
     row = stringToInteger(rowstr);
