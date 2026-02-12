@@ -150,7 +150,11 @@ void random(Grid<int>& currentAge, int& row, int& col) {
     currentAge.resize(row, col);
     for (int r = 0; r < row; r++) {
         for (int c = 0; c < col; c++) {
-            currentAge[r][c] = randomInteger(0, 1);
+            if (randomInteger(0, 1) == 1) {
+                currentAge[r][c] = randomInteger(1, kMaxAge);
+            } else {
+                currentAge[r][c] = 0;
+            }
         }
     }
 }
@@ -175,10 +179,10 @@ void nextGen(Grid<int>& currentAge, Grid<int>& next, LifeDisplay& diagram) {
                 next[r][c] = 0;
                 break;
             case 2:
-                next[r][c] = currentAge[r][c] ? currentAge[r][c] + 1 : 0;
+                next[r][c] = currentAge[r][c] ? min(currentAge[r][c] + 1, kMaxAge) : 0;
                 break;
             case 3:
-                next[r][c] = currentAge[r][c] + 1;
+                next[r][c] = min(currentAge[r][c] + 1, kMaxAge);
                 break;
             default:
                 next[r][c] = 0;
