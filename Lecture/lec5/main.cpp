@@ -12,31 +12,22 @@ int check(const string code) {
         if (code[i] == '(' || code[i] == '{') {
             s.push(code[i]);
         } else if (code[i] == ')') {
-            if (!s.isEmpty()) {
-                if (s.pop() != '(') {
-                    return i;
-                }
-            } else {
+            if (s.isEmpty() || s.pop() != '(') {
                 return i;
             }
         } else if (code[i] == '}') {
-            if (!s.isEmpty()) {
-                if (s.pop() != '{') {
-                    return i;
-                }
-            } else {
+            if (s.isEmpty() || s.pop() != '{') {
                 return i;
             }
         }
     }
-
     if (!s.isEmpty()) {
         return l;
     }
     return -1;
 }
 
-int main(void) {
+int main() {
     string code = getLine("Your code: ");
     cout << check(code) << endl;
     return 0;
