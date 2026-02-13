@@ -1,150 +1,194 @@
 /*
- * File: test_generate_story.cpp
- * -----------------------------
- * Rigorous test suite for generateStory function.
- * Covers 20 distinctive scenarios.
+ * File: test_topswop.cpp
+ * ----------------------
+ * Rigorous test suite for getTopswopNumber function.
+ * Covers 20 distinctive scenarios ranging from trivial to complex.
  */
 
 #include <iostream>
 #include <string>
 #include <iomanip>
 #include "console.h"
-#include "map.h"
+#include "queue.h"
+#include "stack.h"
 #include "vector.h"
 #include "simpio.h"
+#ifdef _WIN32
+#include <windows.h>
+#endif
 using namespace std;
 
-// --- 待测函数 (你的严谨实现) ---
-static string generateStory(const string& storyTemplate, const Map<string, string>& data) {
-    string result = "";
-    for (int i = 0; i < storyTemplate.length(); ++i) {
-        if (storyTemplate[i] != '{') {
-            result += storyTemplate[i];
-        } else {
-            int m = i + 1;
-            string token = "";
-            while (storyTemplate[m] != '}') {
-                token += storyTemplate[m];
-                m++;
-            }
-            result += data[token];
-            i = m;
+// --- 待测函数原型 (请在此处或上方填入你的实现) ---
+static int getTopswopNumber(Stack<int> s) {
+    Queue<int> swap;
+    int times = 0;
+    while (s.peek() != 1) {
+        // out
+        int k = s.peek();
+        for (int i = 1; i <= k; i++) {
+            swap.enqueue(s.pop());
         }
+
+        // in
+        for (int i = 1; i <= k; i++) {
+            s.push(swap.dequeue());
+        }
+
+        times++;
     }
-    return result;
+    return times;
 }
 
-// --- 测试辅助工具 ---
-void runTest(int id, const string& desc, const string& tmpl,
-             const Map<string, string>& map, const string& expected) {
-    string actual = generateStory(tmpl, map);
+/* * 你的实现代码应该放在这里，或者在测试运行前定义。
+ * 为了演示，这里是一个空的占位符。
+ * static int getTopswopNumber(Stack<int> s) { ... }
+ */
+
+// --- 辅助工具：控制台颜色 ---
+void setConsoleColor(bool isSuccess) {
+#ifdef _WIN32
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(hConsole, isSuccess ? 10 : 12); // 10=Green, 12=Red
+#else
+    if (isSuccess) std::cout << "\033[32m";
+    else std::cout << "\033[31m";
+#endif
+}
+
+void resetConsoleColor() {
+#ifdef _WIN32
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
+#else
+    std::cout << "\033[0m";
+#endif
+}
+
+// --- 辅助工具：构建栈 ---
+// input: {2, 5, 1} means 2 is TOP, 1 is BOTTOM.
+Stack<int> buildStack(Vector<int> nums) {
+    Stack<int> s;
+    // Stack is LIFO, so we push from the end of the vector to the beginning
+    // so that index 0 becomes the top.
+    for (int i = nums.size() - 1; i >= 0; i--) {
+        s.push(nums[i]);
+    }
+    return s;
+}
+
+// --- 测试执行工具 ---
+void runTest(int id, const string& desc, Vector<int> inputVec, int expected) {
+    Stack<int> s = buildStack(inputVec);
+    // 传入栈的副本，虽然函数签名通常是传值，这里确保测试框架侧也有备份（如果需要）
+    int actual = getTopswopNumber(s);
     bool pass = (actual == expected);
 
-    cout << "Test " << setw(2) << id << " [" << desc << "]: ";
+    cout << "Test " << setw(2) << id << ": ";
+
+    setConsoleColor(pass);
     if (pass) {
-        cout << "true" << endl;
+        cout << "[PASS] True";
     } else {
-        cout << "false" << endl;
-        cout << "   Expected: \"" << expected << "\"" << endl;
-        cout << "   Actual:   \"" << actual << "\"" << endl;
+        cout << "[FAIL] False";
+    }
+    resetConsoleColor();
+
+    cout << ";" << endl;
+
+    if (!pass) {
+        cout << "   [Context]:  " << desc << endl;
+        cout << "   [Input Top]: " << inputVec.toString() << endl;
+        cout << "   [Expected]: " << expected << endl;
+        cout << "   [Actual]:   " << actual << endl;
     }
 }
 
 int main() {
-    // 1. 构建全量测试数据环境 (Comprehensive Context)
-    Map<string, string> context;
-    // 基础数据
-    context.put("name", "Frank");
-    context.put("action", "coded");
-    context.put("lang", "C++");
-    // Handout 案例数据
-    context.put("actor", "Mike Vernal");
-    context.put("restaurant", "The French Laundry");
-    context.put("rating", "5");
-    context.put("friend", "Jessie Duan");
-    context.put("band", "Green Day");
-    context.put("app", "Spotify");
-    // 边缘情况数据
-    context.put("empty", "");          // 空值
-    context.put("space", " ");         // 空格值
-    context.put("symbol", "#&@!");     // 特殊符号
-    context.put("long", "supercalifragilisticexpialidocious"); // 长词
-    context.put("num", "106");         // 数字
-    context.put("a", "A");             // 单字符键值
-    context.put("b", "B");
+    cout << "--- Topswop Test Suite ---" << endl;
 
-    cout << boolalpha; // 让 bool 输出 true/false 而非 1/0
+    // [Group 1: 基础/平凡情况]
+    // Case 1: n=1, 已经在终态
+    runTest(1, "Single element [1]", {1}, 0);
 
-    // --- 20个严谨测试用例 ---
+    // Case 2: n=2, 已经在终态
+    runTest(2, "Sorted [1, 2]", {1, 2}, 0);
 
-    // [Group 1: 基础逻辑]
-    // Case 1: 无 Token (纯文本)
-    runTest(1, "No tokens", "Hello World", context, "Hello World");
+    // Case 3: n=3, 已经在终态
+    runTest(3, "Sorted [1, 2, 3]", {1, 2, 3}, 0);
 
-    // Case 2: 空字符串
-    runTest(2, "Empty string", "", context, "");
+    // Case 4: n=2, 需要一次翻转
+    // Stack: 2, 1 -> Top is 2. Invert 2 elems -> 1, 2. (1 step)
+    runTest(4, "Simple swap [2, 1]", {2, 1}, 1);
 
-    // Case 3: 仅有一个 Token (全匹配)
-    runTest(3, "Full token", "{name}", context, "Frank");
+    // [Group 2: n=3 排列组合]
+    // Case 5: [2, 1, 3] -> Top 2, swap 2 -> [1, 2, 3] (1 step)
+    runTest(5, "n=3 Case A", {2, 1, 3}, 1);
 
-    // [Group 2: 位置测试]
-    // Case 4: Token 在开头
-    runTest(4, "Token at start", "{name} is here.", context, "Frank is here.");
+    // Case 6: [3, 2, 1] -> Top 3, swap 3 -> [1, 2, 3] (1 step)
+    // 注意：这是完全逆序
+    runTest(6, "Reverse n=3", {3, 2, 1}, 1);
 
-    // Case 5: Token 在结尾
-    runTest(5, "Token at end", "Written by {name}", context, "Written by Frank");
+    // Case 7: [2, 3, 1] -> 2,3,1 -> 3,2,1 -> 1,2,3 (2 steps)
+    runTest(7, "n=3 Case B", {2, 3, 1}, 2);
 
-    // Case 6: Token 在中间
-    runTest(6, "Token in middle", "I {action} today.", context, "I coded today.");
+    // Case 8: [3, 1, 2] -> 3,1,2 -> 2,1,3 -> 1,2,3 (2 steps)
+    runTest(8, "n=3 Case C", {3, 1, 2}, 2);
 
-    // [Group 3: 复杂组合]
-    // Case 7: 多个不同 Token
-    runTest(7, "Multiple tokens", "{name} {action} {lang}.", context, "Frank coded C++.");
+    // [Group 3: Handout 经典案例]
+    // Case 9: 文档中的例子
+    // 2, 5, 1, 3, 4 -> (flip 2) -> 5, 2, 1, 3, 4 -> (flip 5) -> 4, 3, 1, 2, 5
+    // -> (flip 4) -> 2, 1, 3, 4, 5 -> (flip 2) -> 1, 2, 3, 4, 5. (Total 4)
+    runTest(9, "Handout Example", {2, 5, 1, 3, 4}, 4);
 
-    // Case 8: 重复 Token (Repeated Keys)
-    runTest(8, "Repeated tokens", "{name} likes {name}", context, "Frank likes Frank");
+    // [Group 4: n=4 的典型路径]
+    // Case 10: 完全逆序 n=4
+    // 4,3,2,1 -> 1,2,3,4 (1 step)
+    runTest(10, "Reverse n=4", {4, 3, 2, 1}, 1);
 
-    // Case 9: 相邻 Token (无空格分割) - 测试 i=m 的逻辑是否严谨
-    runTest(9, "Adjacent tokens", "{a}{b}", context, "AB");
+    // Case 11: [2, 3, 4, 1]
+    // -> 3,2,4,1 -> 4,2,3,1 -> 1,3,2,4 (3 steps)
+    runTest(11, "n=4 Case A", {2, 3, 4, 1}, 3);
 
-    // [Group 4: 标点与格式]
-    // Case 10: Token 紧贴标点 (前)
-    runTest(10, "Punctuation before", "Hello, {name}!", context, "Hello, Frank!");
+    // Case 12: [3, 4, 2, 1]
+    // -> 2,4,3,1 -> 4,2,3,1 -> 1,3,2,4 (3 steps)
+    runTest(12, "n=4 Case B", {3, 4, 2, 1}, 3);
 
-    // Case 11: Token 紧贴标点 (后) - 文档案例格式 "{rating}-star"
-    runTest(11, "Punctuation after", "A {rating}-star review", context, "A 5-star review");
+    // Case 13: [4, 1, 2, 3]
+    // -> 3,2,1,4 -> 1,2,3,4 (2 steps)
+    runTest(13, "n=4 Case C", {4, 1, 2, 3}, 2);
 
-    // Case 12: Token 被括号包裹 (非Token定界符)
-    runTest(12, "Brackets around", "({name})", context, "(Frank)");
+    // [Group 5: n=5 及更大]
+    // Case 14: 完全逆序 n=5
+    runTest(14, "Reverse n=5", {5, 4, 3, 2, 1}, 1);
 
-    // [Group 5: Map 值的内容边界]
-    // Case 13: Map 值为数字字符串
-    runTest(13, "Numeric value", "Room {num}", context, "Room 106");
+    // Case 15: [2, 3, 4, 5, 1] (循环移位)
+    // -> 3,2,4,5,1 -> 4,2,3,5,1 -> 5,3,2,4,1 -> 1,4,2,3,5 (4 steps)
+    runTest(15, "n=5 Cyclic Shift", {2, 3, 4, 5, 1}, 4);
 
-    // Case 14: Map 值为特殊符号
-    runTest(14, "Symbol value", "Password: {symbol}", context, "Password: #&@!");
+    // Case 16: [5, 1, 2, 3, 4]
+    // -> 4,3,2,1,5 -> 1,2,3,4,5 (2 steps)
+    runTest(16, "n=5 Case A", {5, 1, 2, 3, 4}, 2);
 
-    // Case 15: Map 值为超长字符串 (Buffer check)
-    runTest(15, "Long value", "Word: {long}", context, "Word: supercalifragilisticexpialidocious");
+    // Case 17: n=6 逆序
+    runTest(17, "Reverse n=6", {6, 5, 4, 3, 2, 1}, 1);
 
-    // Case 16: Map 值为空字符串 (Empty replacement)
-    runTest(16, "Empty value", "Value is [{empty}]", context, "Value is []");
+    // [Group 6: 边界压力测试]
+    // Case 18: n=10, 1 在第二位
+    // [2, 1, 3, 4, 5, 6, 7, 8, 9, 10] -> 1, 2... (1 step)
+    runTest(18, "n=10, 1 at pos 2", {2, 1, 3, 4, 5, 6, 7, 8, 9, 10}, 1);
 
-    // Case 17: Map 值为仅空格
-    runTest(17, "Space value", "Gap[{space}]Gap", context, "Gap[ ]Gap");
+    // Case 19: n=10, 1 在栈顶
+    Vector<int> largeSorted;
+    for(int i=1; i<=10; i++) largeSorted.add(i);
+    runTest(19, "n=10 Sorted", largeSorted, 0);
 
-    // [Group 6: 单词内部替换]
-    // Case 18: Token 嵌入单词内部 (Prefix/Suffix)
-    runTest(18, "Embedded token", "Un{empty}believable", context, "Unbelievable");
-
-    // [Group 7: 文档真实案例复现]
-    // Case 19: Handout Problem 2 Example 1
-    runTest(19, "Handout Ex 1", "{friend} accepted your friend request.", context,
-            "Jessie Duan accepted your friend request.");
-
-    // Case 20: Handout Problem 2 Example 5
-    runTest(20, "Handout Ex 5", "{actor} gave {restaurant} a {rating}-star review.", context,
-            "Mike Vernal gave The French Laundry a 5-star review.");
+    // Case 20: 复杂的 n=5
+    // [3, 5, 4, 2, 1]
+    // -> 4, 5, 3, 2, 1
+    // -> 2, 3, 5, 4, 1
+    // -> 3, 2, 5, 4, 1
+    // -> 5, 2, 3, 4, 1
+    // -> 1, 4, 3, 2, 5 (Total 5 steps)
+    runTest(20, "n=5 Complex", {3, 5, 4, 2, 1}, 5);
 
     return 0;
 }
