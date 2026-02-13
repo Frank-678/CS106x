@@ -1,3 +1,5 @@
+// https://www.codestepbystep.com/r/problem/view/cpp/strings/nameDiamond
+
 //#include "console.h"
 #include <iostream>
 #include <string>
