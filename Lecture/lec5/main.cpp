@@ -5,7 +5,7 @@
 #include "stack.h"
 using namespace std;
 
-int check(const string code) {
+int checkBalance(const string code) {
     Stack<char> s;
     int l = code.length();
     for (int i = 0; i < l; ++i) {
@@ -29,6 +29,6 @@ int check(const string code) {
 
 int main() {
     string code = getLine("Your code: ");
-    cout << check(code) << endl;
+    cout << checkBalance(code) << endl;
     return 0;
 }
