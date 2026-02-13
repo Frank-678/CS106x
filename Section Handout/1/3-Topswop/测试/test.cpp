@@ -9,7 +9,6 @@
 #include <string>
 #include <iomanip>
 #include "console.h"
-#include "queue.h"
 #include "stack.h"
 #include "vector.h"
 #include "simpio.h"
@@ -19,25 +18,7 @@
 using namespace std;
 
 // --- 待测函数原型 (请在此处或上方填入你的实现) ---
-static int getTopswopNumber(Stack<int> s) {
-    Queue<int> swap;
-    int times = 0;
-    while (s.peek() != 1) {
-        // out
-        int k = s.peek();
-        for (int i = 1; i <= k; i++) {
-            swap.enqueue(s.pop());
-        }
-
-        // in
-        for (int i = 1; i <= k; i++) {
-            s.push(swap.dequeue());
-        }
-
-        times++;
-    }
-    return times;
-}
+static int getTopswopNumber(Stack<int> s); 
 
 /* * 你的实现代码应该放在这里，或者在测试运行前定义。
  * 为了演示，这里是一个空的占位符。
@@ -79,11 +60,11 @@ Stack<int> buildStack(Vector<int> nums) {
 void runTest(int id, const string& desc, Vector<int> inputVec, int expected) {
     Stack<int> s = buildStack(inputVec);
     // 传入栈的副本，虽然函数签名通常是传值，这里确保测试框架侧也有备份（如果需要）
-    int actual = getTopswopNumber(s);
+    int actual = getTopswopNumber(s); 
     bool pass = (actual == expected);
 
     cout << "Test " << setw(2) << id << ": ";
-
+    
     setConsoleColor(pass);
     if (pass) {
         cout << "[PASS] True";
@@ -91,7 +72,7 @@ void runTest(int id, const string& desc, Vector<int> inputVec, int expected) {
         cout << "[FAIL] False";
     }
     resetConsoleColor();
-
+    
     cout << ";" << endl;
 
     if (!pass) {
@@ -135,7 +116,7 @@ int main() {
 
     // [Group 3: Handout 经典案例]
     // Case 9: 文档中的例子
-    // 2, 5, 1, 3, 4 -> (flip 2) -> 5, 2, 1, 3, 4 -> (flip 5) -> 4, 3, 1, 2, 5
+    // 2, 5, 1, 3, 4 -> (flip 2) -> 5, 2, 1, 3, 4 -> (flip 5) -> 4, 3, 1, 2, 5 
     // -> (flip 4) -> 2, 1, 3, 4, 5 -> (flip 2) -> 1, 2, 3, 4, 5. (Total 4)
     runTest(9, "Handout Example", {2, 5, 1, 3, 4}, 4);
 
