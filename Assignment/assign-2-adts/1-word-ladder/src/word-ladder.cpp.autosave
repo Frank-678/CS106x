@@ -25,6 +25,8 @@ static string getWord(const Lexicon& english, const string& prompt) {
 
 static void generateLadder(const Lexicon& english, const string& start, const string& end) {
     cout << "Here's where you'll search for a word ladder connecting \"" << start << "\" to \"" << end << "\"." << endl;
+    Vector<string> ladder {start};
+    Queue<Vector<string> >ladders;
 }
 
 static const string kEnglishLanguageDatafile = "res/dictionary.txt";
@@ -35,7 +37,11 @@ static void playWordLadder() {
         if (start.empty()) break;
         string end = getWord(english, "Please enter the destination word [return to quit]: ");
         if (end.empty()) break;
-        generateLadder(english, start, end);
+        if (start.length() != end.length()) {
+            cout << "The two endpoints must contain the same number of characters, or else no word ladder can exist." << endl;
+        } else {
+            generateLadder(english, start, end);
+        }
     }
 }
 
