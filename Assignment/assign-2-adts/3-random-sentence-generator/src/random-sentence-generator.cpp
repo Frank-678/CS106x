@@ -4,6 +4,8 @@
  * Presents a short program capable of reading in
  * context-free grammar files and generating arbitrary
  * sentences from them.
+ *
+ * 改题：如果<start>下有多个句子，要将nonterminal随机转化
  */
 
 #include <iostream>
@@ -53,7 +55,7 @@ int main() {
              << "and generate three random sentences." << endl;
 
         ifstream input;
-        input.open(filename.c_str());
+        input.open(getNormalizedFilename(filename).c_str());
         Map<string, Vector<string> > grammar;
         readGrammar(input, grammar);
         input.close();
@@ -87,22 +89,24 @@ void readGrammar(ifstream& input, Map<string, Vector<string> >& grammar) {
     }
 }
 
-bool hasToken(Vector<string> start) {
-    for (string& sentence : start) {
-        if (sentence.find('<') != string::npos) return true;
-    }
-    return false;
-}
-
 void replaceToken(Map<string, Vector<string> >& grammar) {
-    while (hasToken(grammar["<start>"])) {
+    while (true) {
+        bool hasToken = false;
         for (string& sentence : grammar["<start>"]) {
-            int start = sentence.find('<');
-            int end = sentence.find('>');
-            string token = sentence.substr(start, end - start + 1);
-            sentence = sentence.substr(0, start) + grammar[token][randomInteger(0, grammar[token].size() - 1)]
-                       + sentence.substr(end + 1, sentence.length() - end);
+            if (sentence.find('<') != string::npos) {
+                int start = sentence.find('<');
+                int end = sentence.find('>');
+                string token = sentence.substr(start, end - start + 1);
+                if (!grammar.containsKey(token) || grammar[token].isEmpty()) continue;
+                sentence = sentence.substr(0, start) + grammar[token][randomInteger(0, grammar[token].size() - 1)]
+                           + sentence.substr(end + 1, sentence.length() - end);
+
+                if (sentence.find('<') != string::npos) {
+                    hasToken = true;
+                }
+            }
         }
+        if (!hasToken) break;
     }
 }
 
