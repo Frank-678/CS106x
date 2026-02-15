@@ -1,87 +1,66 @@
-/**
- * File: maze-generator.cpp
- * ------------------------
- * Presents an adaptation of Kruskal's algorithm to generate mazes.
- */
-
 #include <iostream>
 #include <string>
-using namespace std;
-
+#include <algorithm>
+#include <random>
 #include "console.h"
 #include "simpio.h"
 #include "set.h"
-
+#include "vector.h"
+#include "random.h"
 #include "maze-graphics.h"
 #include "maze-types.h"
 
+using namespace std;
 
-static int getMazeDimension(string prompt,
-                            int minDimension = 7, int maxDimension = 50) {
-    while (true) {
-        int response = getInteger(prompt);
-        if (response == 0) return response;
-        if (response >= minDimension && response <= maxDimension) return response;
-        cout << "Please enter a number between "
-             << minDimension << " and "
-             << maxDimension << ", inclusive." << endl;
+int findChamber(Vector<Set<cell>>& chambers, cell c) {
+    for (int i = 0; i < chambers.size(); i++) {
+        if (chambers[i].contains(c)) return i;
     }
-}
-
-void initInternal(int dimention, Set<cell>& cells, Set<wall>& walls) {
-    for (int i = 0; i < dimention; ++i) {
-        for (int j = 0; j < dimentionl ++j) {
-            cell c {i, j};
-            cells.add(c);
-        }
-    }
-
-    for (const cell& c1 : cells) {
-        for (const cell& c2 : cells) {
-            if (c1.row == c2.row && c2.col - c1.col == 1
-                || c1.col == c2.col && c2.row - c1.row == 1) {
-                wall w {c1, c2};  // c1左/上于c2
-                walls.add(w);
-            }
-        }
-    }
-}
-
-void randomRemove(int dimention, Set<cell>& cells, Set<wall>& walls) {
-    for (const cell& c1 : cells) {
-        for (const cell& c2 : cells) {
-            if (!walls.contain({c1, c2})) {
-                Set<cell> chamber {c1, c2};
-            }
-
-
-        }
-    }
-}
-
-void render(int dimention, MazeGeneratorView& display){
-    display.MazeGeneratorView();
-    display.setDimension(dimention);
-    display.drawBorder();
+    return -1;
 }
 
 int main() {
+    MazeGeneratorView view;
     while (true) {
-        int dimension = getMazeDimension("What should the dimension of your maze be [0 to exit]? ");
-        if (dimension == 0) break;
-        cout << "This is where I'd animate the construction of a maze of dimension " << dimension << "." << endl;
+        int n = getInteger("Dimension (0 to exit): ");
+        if (n <= 0) break;
 
-        Set<cell> cells;
-        Set<wall> walls;
-        initInternal(dimension, cells, walls);
+        view.setDimension(n);
+        view.drawBorder();
 
-        randomRemove(dimension, cells, walls);
+        Vector<wall> walls;
+        Vector<Set<cell>> chambers;
 
-        MazeGeneratorView display;
-        render(dimension, display);
-        display.repaint();
+        for (int r = 0; r < n; r++) {
+            for (int c = 0; c < n; c++) {
+                Set<cell> s;
+                s.add({r, c});
+                chambers.add(s);
+
+                if (r < n - 1) walls.add({{r, c}, {r + 1, c}});
+                if (c < n - 1) walls.add({{r, c}, {r, c + 1}});
+            }
+        }
+
+        view.addAllWalls(walls);
+        view.repaint();
+
+        // 创建一个随机数生成器 mt
+        static std::mt19937 mt(0);
+        // 调用标准库的 3 参数 shuffle
+        std::shuffle(walls.begin(), walls.end(), mt);
+
+        for (wall w : walls) {
+            int i1 = findChamber(chambers, w.one);
+            int i2 = findChamber(chambers, w.two);
+
+            if (i1 != i2) {
+                view.removeWall(w);
+                view.repaint();
+                chambers[i1] += chambers[i2];
+                chambers.remove(i2);
+            }
+        }
     }
-
     return 0;
 }
-
