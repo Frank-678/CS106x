@@ -1,0 +1,6 @@
+void printBinary(int n) {
+    
+}
+
+
+
