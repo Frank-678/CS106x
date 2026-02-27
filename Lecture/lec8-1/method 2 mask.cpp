@@ -17,7 +17,9 @@ void printBinary(int n) {
 }
 
 int main() {
-    printBinary(10);  cout << '\n';   // 1010
-    printBinary(-10); cout << '\n';   // -1010
-    printBinary(0);   cout << '\n';   // 0
+    while (true) {
+        int n;
+        cin >> n;
+        printBinary(n);
+    }
 }
