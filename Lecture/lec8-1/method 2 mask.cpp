@@ -2,6 +2,12 @@
 #include <iostream>
 using namespace std;
 
+int main() {
+    printBinary(10);  cout << '\n';   // 1010
+    printBinary(-10); cout << '\n';   // -1010
+    printBinary(0);   cout << '\n';   // 0
+}
+
 void printBinary(int n) {
     if (n < 0) {
         cout << '-';
