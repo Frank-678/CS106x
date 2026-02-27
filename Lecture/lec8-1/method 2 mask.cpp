@@ -14,6 +14,7 @@ void printBinary(int n) {
     while ((mask << 1) <= un) mask <<= 1;  // 先位移后判断！（如果n小于1<<x（x+1位）那么必然只有x位）
 
     for (; mask; mask >>= 1) cout << ((un & mask) ? 1 : 0);
+    cout << endl;
 }
 
 int main() {
