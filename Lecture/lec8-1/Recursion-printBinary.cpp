@@ -1,23 +1,17 @@
+// 这确实是一个看似基础却体现思路的重要性的题！Tricky！
+
 void printBinary(int n) {
-    if (n == 0) {
-        cout << 0;
-    } else if (n == 1) {
-        cout << 1;
+    if (n < 0) {
+        cout << "-";
+        printBinary(-n);
+    } else if (n <= 1) {
+        cout << n;
     } else {
-        int exp1;
-        for (exp1 = 0; n > 1 << exp1; exp1++);
-        int rest = n - (1 << exp1 - 1);
-        int exp2;
-        for (exp2 = 0; rest > 1 << exp2; exp2++);
-
-        cout << 1;
-        for (int i = 0; i < exp2 - exp1 +3; i++) {
-            cout << 0;
-        }
-
+        int lastdigit = n % 2;
+        int rest = n / 2;
         printBinary(rest);
+        printBinary(lastdigit);
     }
-
 }
 
 
