@@ -1,4 +1,4 @@
-// 方法二：使用位遮挡 & 1<<x 便可以从左往右判断每一位
+// 方法二：使用位遮挡 & 1<<x 便可以从左往右判断每一位 
 #include <iostream>
 using namespace std;
 
