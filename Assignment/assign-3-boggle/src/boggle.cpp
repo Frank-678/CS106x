@@ -52,7 +52,7 @@ Map<string, Vector<GridLocation> > pathMap;
 const Lexicon english("res/dictionary.txt");
 
 void configBoard(Grid<char>& board, int dimension);
-void precompute(Grid<char>& board, int dimension, string prefix = "");
+void precompute(Grid<char>& board, int dimension);
 void humanTurn();
 void computerTurn();
 
@@ -210,42 +210,63 @@ void configBoard(Grid<char>& board, int dimension) {
 // 首先，要遍历board每个字母作为开头，即prefix+ch，判断是否containsPrefix
 // 那么开启递归：在该字母的neighbor遍历ch再precompute
 // 一旦是合法单词就加入集合 words
-void precomputeHelper(Grid<char>& board, int dimension, string prefix, int r, int c, Grid<bool>& used) {
-    used[r][c] = true; // choose
-    path.add({r, c}); // choose
-    for (int i = -1; i <= 1; i++){
-        for (int j = -1; j <= 1; j++) {
-            if (i == 0 && j == 0) continue;
-            int nr = r + i;
-            int nc = c + j;
 
+// gpt:只要你进入了一个格子（choose），你就改了 3 个状态：used=true、prefix 加字母、path 加坐标
+// 无论这条路最后是因为“不再是前缀”失败，还是“邻居都试完了”自然结束，只要要返回到上一层，
+// 就必须撤销这 3 个改动（unchoose），让上一层继续试其它邻居时状态干净。
+void precomputeHelper(Grid<char>& board, int r, int c,
+                      Grid<bool>& used,
+                      string& prefix) {
+    // choose 当前格子
+    used[r][c] = true;
+    prefix.push_back(board[r][c]);
+    path.add(GridLocation(r, c));
+
+    // prune：前缀不可能就立刻回溯
+    if (!english.containsPrefix(prefix)) {
+        path.remove(path.size() - 1);
+        prefix.pop_back();
+        used[r][c] = false;
+        return;
+    }
+
+    // record：合法单词就收集 +（只存第一条路径）
+    if ((int)prefix.length() >= 4 && english.contains(prefix)) {
+        words.add(prefix);
+        if (!pathMap.containsKey(prefix)) {
+            pathMap[prefix] = path;   // 复制当前路径
+        }
+    }
+
+    // explore 8邻居
+    for (int dr = -1; dr <= 1; dr++) {
+        for (int dc = -1; dc <= 1; dc++) {
+            if (dr == 0 && dc == 0) continue;
+            int nr = r + dr, nc = c + dc;
             if (board.inBounds(nr, nc) && !used[nr][nc]) {
-                prefix.push_back(board[nr][nc]); // choose
-                if (english.contains(prefix)
-                    && prefix.length() >= 4
-                    && !words.contains(prefix)) {
-                    words.add(prefix);
-                    path.add({nr, nc});
-                    pathMap[prefix] = path;
-                    return;
-                } else if (english.containsPrefix(prefix)) {
-                    precomputeHelper(board, dimension, prefix, nr, nc, used);
-                } // else if 最终没有形成单词
-                prefix.pop_back(); // unchoose
-                path.remove(path.size() - 1); // unchoose
-                used[r][c] = false; // unchoose
+                precomputeHelper(board, nr, nc, used, prefix);
             }
         }
     }
+
+    // unchoose 当前格子（恢复现场）
+    path.remove(path.size() - 1);
+    prefix.pop_back();
+    used[r][c] = false;
 }
 
-void precompute(Grid<char>& board, int dimension, string prefix) { // C++ 规定：默认参数只能在某一次“声明”里给出一次（通常放在 .h 或最早的声明里），后面再声明/定义时不能重复写。
+void precompute(Grid<char>& board, int dimension) {
+    // 新开一局记得清空（否则下一局会叠加）
+    words.clear();
+    pathMap.clear();
+    path.clear();
+
     for (int r = 0; r < dimension; r++) {
         for (int c = 0; c < dimension; c++) {
             Grid<bool> used(dimension, dimension, false);
-            prefix.push_back(board[r][c]);                 // 选起点字母
-            precomputeHelper(board, dimension, prefix, r, c, used);
-            prefix.pop_back();
+            string prefix = "";
+            path.clear();                 // 确保起点开始是空路径
+            precomputeHelper(board, r, c, used, prefix);
         }
     }
 }
