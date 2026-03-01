@@ -54,6 +54,7 @@ const Lexicon english("res/dictionary.txt");
 void configBoard(Grid<char>& board, int dimension);
 void precompute(Grid<char>& board, int dimension);
 void humanTurn();
+void humanTurn(string responce);
 void computerTurn();
 
 /**
@@ -126,7 +127,13 @@ static void playBoggle() {
     Grid<char> board(dimension, dimension);
     configBoard(board, dimension);
     precompute(board, dimension);
-    humanTurn();
+    if (getYesOrNo("Wanna cheat?")) {
+        string responce = "Yes, I am a rubbish";
+        cout << "What a rubbish!" << endl;
+        humanTurn(responce);
+    } else {
+        humanTurn();
+    }
     computerTurn();
     cout << "This is where you'd play the game of Boggle" << endl;
 }
@@ -295,6 +302,27 @@ void humanOneTurn(string answer) {
     recordWordForPlayer(answer, HUMAN);
     for (GridLocation cube : pathMap[answer]) {
         highlightCube(cube.row, cube.col, false);
+    }
+}
+
+void humanTurn(string responce) {
+    responce = responce;
+    for (string answer : words) {
+        answer = toUpperCase(answer);
+        if (answer.length() > 4 || answer.length() == 0) {
+            cout << "Enter a word: ";
+            for (char ch : answer){
+                pause(randomReal(100,600));
+                cout << ch << flush;
+            }
+            pause(20);
+            cout << endl;
+            if (answer == "") {
+                cout << "You've completed your turn" << endl;
+                return;
+            }
+            humanOneTurn(answer);
+        }
     }
 }
 
