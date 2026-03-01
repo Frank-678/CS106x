@@ -89,7 +89,7 @@ void readGrammar(ifstream& input, Map<string, Vector<string> >& grammar) {
     }
 }
 
-void replaceToken(Map<string, Vector<string> >& grammar) {
+void replaceToken(Map<string, Vector<string> >& grammar) {  
     while (true) {
         bool hasToken = false;
         for (string& sentence : grammar["<start>"]) {
@@ -99,7 +99,7 @@ void replaceToken(Map<string, Vector<string> >& grammar) {
                 string token = sentence.substr(start, end - start + 1);
                 if (!grammar.containsKey(token) || grammar[token].isEmpty()) continue;
                 sentence = sentence.substr(0, start) + grammar[token][randomInteger(0, grammar[token].size() - 1)]
-                           + sentence.substr(end + 1, sentence.length() - end);
+                           + sentence.substr(end + 1, sentence.length() - end); // 字符串拼接替换token不是最优解，最优的是先逆序压栈再通过出栈时变量替换
 
                 if (sentence.find('<') != string::npos) {
                     hasToken = true;
